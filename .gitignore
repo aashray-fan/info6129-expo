@@ -1,51 +1,35 @@
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
-# for TODO-APP -----------------------------
-
 # dependencies
-todo-app/node_modules/
+node_modules/
 
 # Expo
-todo-app/.expo/
-todo-app/dist/
-todo-app/web-build/
+.expo/
+dist/
+web-build/
 
 # Native
-todo-app/*.orig.*
 *.orig.*
-todo-app/*.jks
 *.jks
-todo-app/*.p8
 *.p8
-todo-app/*.p12
 *.p12
-todo-app/*.key
 *.key
-todo-app/*.mobileprovision
 *.mobileprovision
 
 # Metro
-todo-app/.metro-health-check*
 .metro-health-check*
 
 # debug
-todo-app/npm-debug.*
 npm-debug.*
-todo-app/yarn-debug.*
 yarn-debug.*
-todo-app/yarn-error.*
 yarn-error.*
 
 # macOS
-todo-app/.DS_Store
 .DS_Store
-todo-app/*.pem
 *.pem
 
 # local env files
-todo-app/.env*.local
 .env*.local
 
 # typescript
-todo-app/*.tsbuildinfo
 *.tsbuildinfo
