@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import React from "react";
 import { styles } from "./styles";
 
@@ -13,13 +13,17 @@ const taskRes = {
 
 const Task = (props) => {
   const { description = "", id = 0, done = false } = props?.task;
-  const statusText = done ? taskRes?.statusText.completed : taskRes?.statusText.open;
+  const statusText = done
+    ? taskRes?.statusText.completed
+    : taskRes?.statusText.open;
   return (
-    <View style={styles.container}>
+    <Pressable style={styles.container} onPress={() => props?.onPressTask(props.task)}>
       <Text style={styles.descText}>{description}</Text>
       <Text style={styles.smallText}>{`${taskRes?.Id}: ${id}`}</Text>
-      <Text style={styles.smallText}>{`${taskRes?.Status}: ${statusText}`}</Text>
-    </View>
+      <Text
+        style={styles.smallText}
+      >{`${taskRes?.Status}: ${statusText}`}</Text>
+    </Pressable>
   );
 };
 

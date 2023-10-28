@@ -6,10 +6,11 @@ export const styles = StyleSheet.create({
   },
   mainContainer: {
     width: "100%",
+    padding: 10,
+  },
+  headerView: {
     backgroundColor: "#FF8400",
     padding: 10,
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
   },
   errorView: {
     flexDirection: "row",
@@ -46,7 +47,7 @@ export const styles = StyleSheet.create({
   },
   inputText: {
     fontSize: 16,
-    color: "#FFFFFF",
+    color: "#000",
     fontWeight: "600",
     marginRight: 10,
   },
@@ -64,10 +65,16 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     width: "25%",
     alignSelf: "flex-end",
+    borderWidth: 3,
   },
   addText: {
     fontSize: 18,
     color: "#FF8400",
+    fontWeight: "bold",
+  },
+  headerText: {
+    color: "#FFF",
+    fontSize: 20,
     fontWeight: "bold",
   },
 });

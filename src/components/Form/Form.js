@@ -18,13 +18,13 @@ const formRes = {
   inputPlaceholder: "Enter a task description",
   toggleText: "Completed",
   toggleTrackColor: {
-    false: "#F0F0F0",
+    false: "#cccccc",
     true: "#34C759",
   },
   toggleThumbColor: "#FFFFFF",
 };
 
-const Form = ({ onAddTask }) => {
+const Form = ({ onAddTask, navigation }) => {
   const [error, setError] = useState(false);
   const [description, setDescription] = useState("");
   const [done, setDone] = useState(false);
@@ -39,6 +39,7 @@ const Form = ({ onAddTask }) => {
     onAddTask({ description, done });
     setDescription("");
     setDone(false);
+    navigation.navigate("List")
   };
 
   // RENDER
@@ -90,7 +91,11 @@ const Form = ({ onAddTask }) => {
     <KeyboardAvoidingView
       behavior={formRes?.keyboardAvoidBehavior}
       style={styles.keyboardAvoid}
+      enabled={false}
     >
+      <View style={styles.headerView}>
+        <Text style={styles.headerText}>Add Task</Text>
+      </View>
       <View style={styles.mainContainer}>
         {error && renderError()}
         {renderInput()}
