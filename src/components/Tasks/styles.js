@@ -75,7 +75,14 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
   modalButtonIcon: {
-    height:'50%',
+    height: "50%",
     aspectRatio: 1,
-  }
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#000000",
+    textAlign: "center",
+    marginVertical: 20,
+  },
 });

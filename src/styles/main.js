@@ -1,4 +1,12 @@
-import { Platform, StyleSheet } from "react-native";
+import { Dimensions, Platform, StyleSheet } from "react-native";
+
+const WIDTH = Dimensions.get("window").width;
+
+const Color = {
+  modalOverlay: "rgba(169,169,169, 0.5)",
+  white: "#FFFFFF",
+  black: "#000000",
+};
 
 export const styles = StyleSheet.create({
   container: {
@@ -16,7 +24,7 @@ export const styles = StyleSheet.create({
     width: "100%",
     borderTopLeftRadius: 100,
     borderTopRightRadius: 100,
-    backgroundColor: "#FFF"
+    backgroundColor: "#FFF",
   },
   bottomTabButton: {
     width: "50%",
@@ -31,5 +39,35 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: "center",
     fontWeight: "600",
+  },
+  AIcontainer: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: Color.modalOverlay,
+  },
+  AIinnerContainer: {
+    width: WIDTH * 0.25,
+    height: WIDTH * 0.25,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: Color.white,
+    borderRadius: 20,
+    shadowColor: Color.black,
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.29,
+    shadowRadius: 4.65,
+    elevation: 7,
+  },
+  AImsg: {
+    marginTop: 10,
+    fontSize: 14,
+    textAlign: "center",
+    color: Color.black,
   },
 });

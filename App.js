@@ -1,31 +1,32 @@
 import { StatusBar } from "expo-status-bar";
-import { Image, Pressable, SafeAreaView, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  Pressable,
+  SafeAreaView,
+  Text,
+  View,
+} from "react-native";
 import Header from "./src/components/Header/Header";
 import Tasks from "./src/components/Tasks/Tasks";
 import Form from "./src/components/Form/Form";
 import uuid from "react-uuid";
 import { styles } from "./src/styles/main";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-const taskList = [
-  {
-    id: uuid(),
-    description: "Walk the dog",
-    done: true,
-  },
-  {
-    id: uuid(),
-    description: "Wash the car",
-    done: false,
-  },
-  {
-    id: uuid(),
-    description: "Finish the lab",
-    done: false,
-  },
-];
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+import { app } from "./firebaseConfig";
 
 const appRes = {
   statusBar: {
@@ -42,21 +43,28 @@ const appRes = {
   },
   KEY_LIST: "List",
   KEY_ADD: "Add",
+  AI: {
+    Color: {
+      themeOrange: "#FF8400",
+    },
+  },
+  DB_COLLECTION: "tasks",
 };
 
 const Tab = createBottomTabNavigator();
+const db = getFirestore(app);
+const collectionRef = collection(db, appRes?.DB_COLLECTION);
 
 const TabBar = (props) => {
   const { navigation } = props;
-  const [isListActive, setisListActive] = useState(true);
+  const isListActive =
+    props?.state?.routeNames[props?.state?.index] === appRes?.KEY_LIST;
 
   const onPressList = () => {
-    setisListActive(true);
     navigation.navigate(appRes.KEY_LIST);
   };
 
   const onPressAdd = () => {
-    setisListActive(false);
     navigation.navigate(appRes.KEY_ADD);
   };
 
@@ -92,28 +100,92 @@ const TabBar = (props) => {
   );
 };
 
+const AppLoader = ({ isVisible, AImsg }) => {
+  if (isVisible) {
+    return (
+      <View style={styles.AIcontainer}>
+        <View style={styles.AIinnerContainer}>
+          <ActivityIndicator
+            size="large"
+            color={appRes?.AI.Color.themeOrange}
+          />
+          <Text style={styles.AImsg}>{AImsg}</Text>
+        </View>
+      </View>
+    );
+  }
+  return null;
+};
+
 const App = () => {
-  const [tasks, setTasks] = useState(taskList);
+  const [tasks, setTasks] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [AImsg, setAImsg] = useState("Loading...");
+
+  useEffect(() => {
+    getTasks();
+  }, []);
+
+  const getTasks = () => {
+    setAImsg("Loading...");
+    setIsLoading(true);
+    getDocs(collectionRef)
+      .then((querySnapshot) => {
+        const tempTasks = [];
+        querySnapshot.forEach((doc) => {
+          tempTasks.push({ ...doc.data(), id: doc.id });
+          setTasks(tempTasks);
+        });
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.log("Error getting documents: ", error);
+        Alert.alert("Error", "Error getting documents: " + error);
+      });
+  };
 
   const handleAddTask = (task) => {
-    const tempTasks = [...tasks];
-    const newTask = { ...task, id: uuid() };
-    tempTasks.push(newTask);
-    setTasks(tempTasks);
+    setAImsg("Saving...");
+    setIsLoading(true);
+    addDoc(collectionRef, task)
+      .then((docRef) => {
+        setIsLoading(false);
+        getTasks();
+      })
+      .catch((error) => {
+        console.error("Error adding document: ", error);
+        Alert.alert("Error", "Error adding document: " + error);
+      });
   };
 
   const handleUpdateTask = ({ id, status }) => {
-    const tempTasks = [...tasks];
-    const index = tempTasks.findIndex((t) => t.id === id);
-    tempTasks[index].done = status;
-    setTasks(tempTasks);
+    setAImsg("Saving...");
+    setIsLoading(true);
+    const docRef = doc(db, appRes?.DB_COLLECTION, id);
+    updateDoc(docRef, { done: status })
+      .then(() => {
+        setIsLoading(false);
+        getTasks();
+      })
+      .catch((error) => {
+        console.error("Error updating document: ", error);
+        Alert.alert("Error", "Error updating document: " + error);
+      });
   };
 
   const handleRemoveTask = ({ id }) => {
-    const tempTasks = [...tasks];
-    const index = tempTasks.findIndex((t) => t.id === id);
-    tempTasks.splice(index, 1);
-    setTasks(tempTasks);
+    setAImsg("Saving...");
+    setIsLoading(true);
+    const docRef = doc(db, appRes?.DB_COLLECTION, id);
+    deleteDoc(docRef)
+      .then(() => {
+        setIsLoading(false);
+        getTasks();
+      })
+      .catch((error) => {
+        console.error("Error removing document: ", error);
+        Alert.alert("Error", "Error removing document: " + error);
+      });
   };
 
   return (
@@ -145,6 +217,7 @@ const App = () => {
             </Tab.Screen>
           </Tab.Navigator>
         </View>
+        <AppLoader isVisible={isLoading} AImsg={AImsg} />
       </NavigationContainer>
     </SafeAreaView>
   );

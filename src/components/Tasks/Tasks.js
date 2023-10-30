@@ -116,13 +116,17 @@ const Tasks = ({ tasks, onUpdateTask, onRemoveTask }) => {
 
   return (
     <View style={styles.mainContainer}>
-      <FlatList
-        data={tasks}
-        renderItem={({ item, index }) => (
-          <Task key={index} task={item} onPressTask={onPressTask} />
-        )}
-        showsVerticalScrollIndicator={false}
-      />
+      {tasks?.length > 0 ? (
+        <FlatList
+          data={tasks}
+          renderItem={({ item, index }) => (
+            <Task key={index} task={item} onPressTask={onPressTask} />
+          )}
+          showsVerticalScrollIndicator={false}
+        />
+      ) : (
+        <Text style={styles.emptyText}>There are no tasks in the list</Text>
+      )}
       {renderModal()}
     </View>
   );
