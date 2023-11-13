@@ -11,11 +11,11 @@ import {
 import Header from "./src/components/Header/Header";
 import Tasks from "./src/components/Tasks/Tasks";
 import Form from "./src/components/Form/Form";
-import uuid from "react-uuid";
 import { styles } from "./src/styles/main";
 import { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import * as Notifications from "expo-notifications";
 
 import {
   getFirestore,
@@ -27,6 +27,7 @@ import {
   doc,
 } from "firebase/firestore";
 import { app } from "./firebaseConfig";
+import Settings from "./src/components/Settings/Settings";
 
 const appRes = {
   statusBar: {
@@ -38,11 +39,14 @@ const appRes = {
     activeColor: "#FF8400",
     listImg: require("./src/assets/images/list.png"),
     addImg: require("./src/assets/images/plus.png"),
+    settingImg: require("./src/assets/images/setting.png"),
     listText: "List Tasks",
     addText: "Add Task",
+    settingsText: "Settings",
   },
   KEY_LIST: "List",
   KEY_ADD: "Add",
+  KEY_SETTING: "Settings",
   AI: {
     Color: {
       themeOrange: "#FF8400",
@@ -55,10 +59,21 @@ const Tab = createBottomTabNavigator();
 const db = getFirestore(app);
 const collectionRef = collection(db, appRes?.DB_COLLECTION);
 
+const renderTabBarItem = ({ color, image, text, onPress }) => (
+  <Pressable style={styles.bottomTabButton} onPress={onPress}>
+    <Image source={image} style={styles.bottomTabIcon} tintColor={color} />
+    <Text style={[styles.bottomTabText, { color }]}>{text}</Text>
+  </Pressable>
+);
+
 const TabBar = (props) => {
   const { navigation } = props;
   const isListActive =
     props?.state?.routeNames[props?.state?.index] === appRes?.KEY_LIST;
+  const isAddActive =
+    props?.state?.routeNames[props?.state?.index] === appRes?.KEY_ADD;
+  const isSettingActive =
+    props?.state?.routeNames[props?.state?.index] === appRes?.KEY_SETTING;
 
   const onPressList = () => {
     navigation.navigate(appRes.KEY_LIST);
@@ -68,34 +83,39 @@ const TabBar = (props) => {
     navigation.navigate(appRes.KEY_ADD);
   };
 
+  const onPressSettings = () => {
+    navigation.navigate(appRes.KEY_SETTING);
+  };
+
   const listColor = isListActive
     ? appRes?.tabBar?.activeColor
     : appRes?.tabBar?.inactiveColor;
-  const addColor = !isListActive
+  const addColor = isAddActive
+    ? appRes?.tabBar?.activeColor
+    : appRes?.tabBar?.inactiveColor;
+  const settingColor = isSettingActive
     ? appRes?.tabBar?.activeColor
     : appRes?.tabBar?.inactiveColor;
   return (
     <View style={styles.bottomTabView}>
-      <Pressable style={styles.bottomTabButton} onPress={onPressList}>
-        <Image
-          source={appRes?.tabBar?.listImg}
-          style={styles.bottomTabIcon}
-          tintColor={listColor}
-        />
-        <Text style={[styles.bottomTabText, { color: listColor }]}>
-          {appRes?.tabBar?.listText}
-        </Text>
-      </Pressable>
-      <Pressable style={styles.bottomTabButton} onPress={onPressAdd}>
-        <Image
-          source={appRes?.tabBar?.addImg}
-          style={styles.bottomTabIcon}
-          tintColor={addColor}
-        />
-        <Text style={[styles.bottomTabText, { color: addColor }]}>
-          {appRes?.tabBar?.addText}
-        </Text>
-      </Pressable>
+      {renderTabBarItem({
+        color: listColor,
+        text: appRes?.tabBar?.listText,
+        image: appRes?.tabBar?.listImg,
+        onPress: onPressList,
+      })}
+      {renderTabBarItem({
+        color: addColor,
+        text: appRes?.tabBar?.addText,
+        image: appRes?.tabBar?.addImg,
+        onPress: onPressAdd,
+      })}
+      {renderTabBarItem({
+        color: settingColor,
+        text: appRes?.tabBar?.settingsText,
+        image: appRes?.tabBar?.settingImg,
+        onPress: onPressSettings,
+      })}
     </View>
   );
 };
@@ -215,6 +235,9 @@ const App = () => {
             <Tab.Screen name={appRes?.KEY_ADD}>
               {(props) => <Form {...props} onAddTask={handleAddTask} />}
             </Tab.Screen>
+            <Tab.Screen name={appRes?.KEY_SETTING}>
+              {(props) => <Settings {...props} />}
+            </Tab.Screen>
           </Tab.Navigator>
         </View>
         <AppLoader isVisible={isLoading} AImsg={AImsg} />
@@ -224,3 +247,18 @@ const App = () => {
 };
 
 export default App;
+
+// NOTIFICATION LISTENER
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+  handleSuccess: (notificationId) => {
+    console.log("Handle Success:", notificationId);
+  },
+  handleError: (notificationId, error) => {
+    console.log("Handle Error:", error);
+  },
+});

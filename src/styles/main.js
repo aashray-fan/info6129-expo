@@ -27,7 +27,7 @@ export const styles = StyleSheet.create({
     backgroundColor: "#FFF",
   },
   bottomTabButton: {
-    width: "50%",
+    flex: 1,
     alignItems: "center",
     justifyContent: "space-evenly",
   },
